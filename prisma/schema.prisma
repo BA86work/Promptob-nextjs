@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL_NON_POOLING")
+}
+
+model ChatHistory {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  message    String
+  response   String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [facebookId])
+
+  @@map("chat_histories")
+}
+
+model User {
+  id                String        @id @default(uuid())
+  facebookId        String        @unique @map("facebook_id")
+  firstName         String?       @map("first_name")
+  lastName          String?       @map("last_name")
+  profilePic        String?       @map("profile_pic")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  lastInteractionAt DateTime      @default(now()) @map("last_interaction_at")
+  chatHistories     ChatHistory[]
+
+  @@map("users")
+}
+
+model Setting {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@map("settings")
+} 
